@@ -1,0 +1,39 @@
+prometheusOperator:
+  createCustomResource: false
+
+grafana:
+  adminPassword: admin
+  storageSpec:
+    volumeClaimTemplate:    
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: prometheus-local-pvc
+        resources:
+          requests:
+            storage: 2Gi
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      # nginx.ingress.kubernetes.io/rewrite-target: /$1
+      # nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    hosts:
+      - grafana.szymonrichert.pl
+    path: /
+    # grafana/?(.*)
+  grafana.ini:
+    server:
+      root_url: https://grafana.szymonrichert.pl/
+
+prometheus:
+  prometheusSpec:
+    retentionSize: 10GB
+    storageSpec:
+      volumeClaimTemplate:    
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: prometheus-local-pvc
+          resources:
+            requests:
+              storage: 10Gi
