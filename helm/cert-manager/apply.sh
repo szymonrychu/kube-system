@@ -24,8 +24,8 @@ spec:
         ingress:
           class: nginx
       selector:
-        dnsNames:
+        dnsZones:
         - 'szymonrichert.pl'
-        - '*.szymonrichert.pl'
 
 EOF
+#         - '*.szymonrichert.pl'
