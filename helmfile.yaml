@@ -38,3 +38,13 @@ releases:
     namespace: monitoring
     version: 8.13.12
     <<: *default
+
+  - name: emby
+    chart: ./emby
+    namespace: emby
+    <<: *default
+
+  - name: ovh-dns-updater
+    chart: ./baremetal_external_dns/ovh-dns-updater
+    namespace: kube-system
+    <<: *default

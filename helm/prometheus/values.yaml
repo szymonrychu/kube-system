@@ -18,11 +18,9 @@ grafana:
     hosts:
       - grafana.szymonrichert.pl
     path: /
-
     tls:
       - hosts:
         - grafana.szymonrichert.pl
-        - test.szymonrichert.pl
         secretName: grafana-tls
   grafana.ini:
     server:

@@ -87,6 +87,7 @@ while True:
             if ovh_entry['subDomain'] in ovh_txt_entries.keys() and ovh_txt_entries[ovh_entry['subDomain']]['target'] == f"1|{ovh_domain}":
                 print(f"Deleting redundant OVH entry {ovh_entry['host']} with ID {ovh_entry['id']}")
                 client.delete(f"{main_url}/{ovh_entry['id']}")
+                client.delete(f"{main_url}/{ovh_txt_entries[ovh_entry['subDomain']]['id']}")
             else:
                 print(f"Ignoring existing OVH entry {ovh_entry['host']} with ID {ovh_entry['id']} due lack of TXT entry")
     

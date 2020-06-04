@@ -17,6 +17,37 @@ spec:
     path: "/mnt/prometheus-local-pvc"
 EOF
 
+kubectl apply -f - <<EOF
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: emby-local-pv
+  labels:
+    type: local
+spec:
+  storageClassName: emby-local-pv
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/emby"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: emby-local-pvc
+  namespace: emby
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: emby-local-pv
+EOF
+
 kubectl get namespace monitoring > /dev/null 2>&1 || kubectl create namespace monitoring
 
 helmfile apply
