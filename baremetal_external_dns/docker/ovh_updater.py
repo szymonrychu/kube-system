@@ -17,53 +17,77 @@ client = ovh.Client(
 ovh_domain = os.environ.get('OVH_DOMAIN')
 
 # kubernetes.config.load_kube_config()
-
 kubernetes.config.load_incluster_config()
+
 api_instance = kubernetes.client.ExtensionsV1beta1Api()
-main_url = f"/domain/zone/{os.environ.get('OVH_DOMAIN')}/record"
 
 while True:
-    ovh_ids = client.get(main_url)
-    for id in ovh_ids:
+    ovh_entries = []
+    ovh_txt_entries = {}
+    ingresses = []
+    my_ip = requests.get('http://ip.42.pl/raw').text
+    # scrape kubernetes ingresses
+    for ingress in api_instance.list_ingress_for_all_namespaces().items:
+        print(f"Found ingress {ingress.metadata.namespace}/{ingress.metadata.name}\n  rules:")
+        for rule in ingress.spec.rules:
+            if rule.host:
+                if str(rule.host).endswith(ovh_domain):
+                    print(f"  -   valid: {rule.host}")
+                    subdomain = str(rule.host)[:-len(ovh_domain)-1]
+                    ingresses.append({'name': str(ingress.metadata.name), 'namespace': str(ingress.metadata.namespace), 'host': str(rule.host), 'subDomain': subdomain})
+                else:
+                    print(f"  - invalid: {rule.host}")
+
+    # scrape OVH
+    main_url = f"/domain/zone/{ovh_domain}/record"
+    print('OVH entries:')
+    for id in client.get(main_url):
         id_url = f"{main_url}/{id}"
         details = client.get(id_url)
-        if details['fieldType'] == 'A' and details['zone'] == os.environ.get('OVH_DOMAIN') and details['subDomain'] == '':
-            domain_field = {'fieldType': 'A', 'target': requests.get('http://ip.42.pl/raw').text, 'ttl': 60}
-            client.put(f"{main_url}/{details['id']}", **domain_field)
-            # {'id': 5120958531, 'zone': 'szymonrichert.pl', 'subDomain': '', 'fieldType': 'A', 'target': '213.186.33.5', 'ttl': 0}
+        if details['fieldType'] == 'TXT' and details['zone'] == ovh_domain:
+            ovh_txt_entries[details['subDomain'] if details['subDomain'] != '' else '~'] = { 'target': details['target'], 'id': details['id'] }
+        if details['fieldType'] == 'A' and details['zone'] == ovh_domain:
+            print(f"  - subDomain:{details['subDomain']} type:{details['fieldType']} target:{details['target']}")
+            if details['subDomain'] != '':
+                host = f"{details['subDomain']}.{details['zone']}"
+            else:
+                host = details['zone']
+            ovh_entries.append({'host': host, 'target': details['target'], 'id': details['id'], 'subDomain': details['subDomain'] if details['subDomain'] != '' else '~'})
 
 
-    for ingress in api_instance.list_ingress_for_all_namespaces().items:
-        for rule in ingress.spec.rules:
-            print(rule)
-            if rule.host and str(rule.host).endswith(ovh_domain):
-                subdomain_to_update = rule.host[:-len(ovh_domain)-1]
-                txt_meta = f"1|szymonrichert.pl"
-                records_to_update = [
-                    # {'fieldType': 'CNAME', 'target': ovh_domain + '.', 'subDomain': subdomain_to_update, 'ttl': 60},
-                    {'fieldType': 'A', 'target': requests.get('http://ip.42.pl/raw').text, 'subDomain': subdomain_to_update, 'ttl': 60},
-                    {'fieldType': 'TXT', 'target': txt_meta, 'subDomain': subdomain_to_update},
-                ]
-                def equals(details1, details2):
-                    return details1['fieldType'] == details2['fieldType'] and details1['target'] == details2['target'] and details1['subDomain'] == details2['subDomain']
+    # add missing dns entries
+    for ingress in ingresses:
+        found_entry = False
+        for ovh_entry in ovh_entries:
+            if ovh_entry['host'] == ingress['host']:
+                found_entry = True
+                if ovh_entry['subDomain'] in ovh_txt_entries.keys() and ovh_txt_entries[ovh_entry['subDomain']]['target'] == f"1|{ovh_domain}":
+                    if ovh_entry['target'] != my_ip:
+                        print(f"Updating existing OVH entry {ovh_entry['subDomain']} with ID {ovh_entry['id']}")
+                        client.put(f"{main_url}/{ovh_entry['id']}", fieldType='A', target=my_ip, ttl=60)
+                    else:
+                        print(f"OVH entry {ovh_entry['host']} with ID {ovh_entry['id']} up to date")
+                else:
+                    print(f"Ignoring existing OVH entry {ovh_entry['host']} with ID {ovh_entry['id']} due lack of TXT entry")
+                break
+        if not found_entry:
+            print(f"Creating missing OVH entry {ingress['host']}")
+            client.post(main_url, fieldType='A', target=my_ip, ttl=60, subDomain=ingress['subDomain'])
+            client.post(main_url, fieldType='TXT', target=f"1|{ovh_domain}", subDomain=ingress['subDomain'])
+
+    # # delete unnecessary OVH entries not created by us
+    for ovh_entry in ovh_entries:
+        found_entry = False
+        for ingress in ingresses:
+            if ovh_entry['host'] == ingress['host']:
+                found_entry = True
+                break
+            
+        if not found_entry:
+            if ovh_entry['subDomain'] in ovh_txt_entries.keys() and ovh_txt_entries[ovh_entry['subDomain']]['target'] == f"1|{ovh_domain}":
+                print(f"Deleting redundant OVH entry {ovh_entry['host']} with ID {ovh_entry['id']}")
+                client.delete(f"{main_url}/{ovh_entry['id']}")
+            else:
+                print(f"Ignoring existing OVH entry {ovh_entry['host']} with ID {ovh_entry['id']} due lack of TXT entry")
     
-                records = []
-                for id in ovh_ids:
-                    id_url = f"{main_url}/{id}"
-                    details = client.get(id_url)
-                    if details['subDomain'] == subdomain_to_update:
-                        records.append(details)
-
-                for record_to_update in records_to_update:
-                    found = False
-                    for record in records:
-                        if record['fieldType'] == record_to_update['fieldType']:
-                            found = True
-                            if not equals(record, record_to_update):
-                                client.put(f"{main_url}/{record['id']}", **record_to_update)
-                    if not found:
-                        client.post(main_url, **record_to_update)
-    time.sleep(30)
-
-
-
+    time.sleep(int(os.environ.get('OVH_UPDATER_SLEEP_TIME', '60')))

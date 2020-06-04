@@ -1,6 +1,3 @@
-prometheusOperator:
-  createCustomResource: false
-
 grafana:
   adminPassword: admin
   storageSpec:
@@ -25,6 +22,7 @@ grafana:
     tls:
       - hosts:
         - grafana.szymonrichert.pl
+        - test.szymonrichert.pl
         secretName: grafana-tls
   grafana.ini:
     server:

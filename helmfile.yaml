@@ -1,0 +1,40 @@
+repositories:
+  - name: stable
+    url: https://kubernetes-charts.storage.googleapis.com
+  - name: bitnami
+    url: https://charts.bitnami.com/incubator
+  - name: jetstack
+    url: https://charts.jetstack.io
+
+templates:
+  default: &default
+    missingFileHandler: Warn
+    values:
+      - helm/{{`{{ .Release.Name }}`}}/values.yaml
+    secrets:
+      - helm/{{`{{ .Release.Name }}`}}/values.secrets.yaml
+
+releases:
+  - name: ingress
+    chart: stable/nginx-ingress
+    namespace: kube-system
+    version: 1.39.0
+    <<: *default
+
+  - name: cert-manager
+    chart: jetstack/cert-manager
+    namespace: kube-system
+    version: 0.15.1
+    <<: *default
+
+  - name: metallb
+    chart: stable/metallb
+    namespace: kube-system
+    version: 0.12.0
+    <<: *default
+
+  - name: prometheus
+    chart: stable/prometheus-operator
+    namespace: monitoring
+    version: 8.13.12
+    <<: *default
