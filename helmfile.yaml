@@ -5,6 +5,12 @@ repositories:
     url: https://charts.bitnami.com/incubator
   - name: jetstack
     url: https://charts.jetstack.io
+  - name: billimek
+    url: https://billimek.com/billimek-charts/
+  - name: loki
+    url: https://grafana.github.io/loki/charts
+  - name: halkeye
+    url: https://halkeye.github.io/helm-charts/
 
 templates:
   default: &default
@@ -48,3 +54,22 @@ releases:
     chart: ./baremetal_external_dns/ovh-dns-updater
     namespace: kube-system
     <<: *default
+
+  - name: rtorrent
+    chart: billimek/rtorrent-flood
+    version: 4.1.1
+    namespace: rtorrent
+    <<: *default
+
+  # - name: octoprint
+  #   chart: halkeye/octoprint
+  #   version: 0.1.1
+  #   namespace: octoprint
+  #   <<: *default
+
+  - name: loki
+    chart: loki/loki-stack
+    version: 0.37.3
+    namespace: loki
+    <<: *default
+
