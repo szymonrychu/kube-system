@@ -29,6 +29,20 @@ grafana:
   grafana.ini:
     server:
       root_url: https://grafana.szymonrichert.pl/
+    smtp:
+      enabled: true
+      host: "smtp.gmail.com:465"
+      from_address: "monitoring.szymonrichert.pl@gmail.com"
+      user: "monitoring.szymonrichert.pl@gmail.com"
+      password: "iYZMKpahRuP87e7c4ACUd7RYGECD7J4H"
+
+alertmanager:
+  config:
+    global:
+      smtp_smarthost: "smtp.gmail.com:465"
+      smtp_auth_username: "monitoring.szymonrichert.pl@gmail.com"
+      smtp_from: "monitoring.szymonrichert.pl@gmail.com"
+      smtp_auth_password: "iYZMKpahRuP87e7c4ACUd7RYGECD7J4H"
 
 prometheus:
   prometheusSpec:
