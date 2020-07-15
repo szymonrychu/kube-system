@@ -44,6 +44,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "ovh-dns-updater.fullname" . }}
                   key: applicationSecret
+            - name: OVH_UPDATER_SLEEP_TIME
+              value: "60"
             - name: OVH_APPLICATION_KEY
               valueFrom:
                 secretKeyRef:
