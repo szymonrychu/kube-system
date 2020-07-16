@@ -14,6 +14,7 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/re
 
 
 kubectl apply -f - <<EOF
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -28,40 +29,36 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/mnt/disk/prometheus"
-EOF
-
-kubectl apply -f - <<EOF
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: emby-local-pv
+  name: grafana-local-pvc
   labels:
     type: local
 spec:
-  storageClassName: emby-local-pv
+  storageClassName: grafana-local-pvc
   capacity:
-    storage: 500Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/disk/emby"
+    path: "/mnt/disk/grafana"
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: emby-local-pvc
-  namespace: emby
+  name: loki-local-pvc
+  labels:
+    type: local
 spec:
+  storageClassName: loki-local-pv
+  capacity:
+    storage: 10Gi
   accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 500Gi
-  storageClassName: emby-local-pv
-EOF
-
-kubectl apply -f - <<EOF
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/disk/loki"
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -79,20 +76,19 @@ spec:
     path: "/mnt/disk/emby/medias"
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: rtorrent-local-pvc
-  namespace: rtorrent
+  name: emby-local-pv
+  labels:
+    type: local
 spec:
+  storageClassName: emby-local-pv
+  capacity:
+    storage: 500Gi
   accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 500Gi
-  storageClassName: rtorrent-local-pv
-EOF
-
-kubectl apply -f - <<EOF
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/disk/emby"
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -108,6 +104,48 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/mnt/disk/rtorrent"
+EOF
+
+kubectl apply -f - <<EOF
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: emby-local-pvc
+  namespace: emby
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: emby-local-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-local-pvc
+  namespace: loki
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: loki-local-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rtorrent-local-pvc
+  namespace: rtorrent
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: rtorrent-local-pv
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -121,6 +159,9 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: rtorrent-config-local-pv
+EOF
+
+kubectl apply -f - <<EOF
 ---
 apiVersion: v1
 data:
@@ -158,7 +199,6 @@ spec:
         - 'szymonrichert.pl'
 
 EOF
-
 
 kubectl apply -f - <<EOF
 ---

@@ -1,8 +1,40 @@
 loki:
   enabled: true
+  persistence:
+    enabled: true
+    accessModes:
+    - ReadWriteOnce
+    size: 10Gi
+    existingClaim: loki-local-pvc
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  config:
+    schema_config:
+      configs:
+      - from: 2018-04-15
+        store: boltdb
+        object_store: filesystem
+        schema: v9
+        index:
+          prefix: index_
+          period: 24h
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 168h
 
 promtail:
   enabled: true
+
+
+
+
 
 grafana:
   enabled: false

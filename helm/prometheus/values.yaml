@@ -4,14 +4,15 @@ prometheusOperator:
   
 grafana:
   adminPassword: admin
-  storageSpec:
-    volumeClaimTemplate:    
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        storageClassName: prometheus-local-pvc
-        resources:
-          requests:
-            storage: 2Gi
+  initChownData:
+    enabled: false
+  persistence:
+    type: pvc
+    enabled: true
+    storageClassName: grafana-local-pvc
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
   ingress:
     enabled: true
     annotations:
@@ -35,6 +36,15 @@ grafana:
       from_address: "monitoring.szymonrichert.pl@gmail.com"
       user: "monitoring.szymonrichert.pl@gmail.com"
       password: "iYZMKpahRuP87e7c4ACUd7RYGECD7J4H"
+  
+  additionalDataSources:
+    - name: Loki
+      editable: false
+      orgId: 1
+      access: proxy
+      type: loki
+      url: http://loki.loki.svc.cluster.local:3100
+      version: 1
 
 alertmanager:
   config:
