@@ -2,7 +2,7 @@ repositories:
   - name: stable
     url: https://kubernetes-charts.storage.googleapis.com
   - name: bitnami
-    url: https://charts.bitnami.com/incubator
+    url: https://charts.bitnami.com/bitnami
   - name: jetstack
     url: https://charts.jetstack.io
   - name: billimek
@@ -15,10 +15,18 @@ repositories:
 templates:
   default: &default
     missingFileHandler: Warn
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "bash"
+        args: [ "./scripts/post.sh", "{{`{{ .Release.Name }}`}}"]
+      - events: ["prepare"]
+        showlogs: true
+        command: "bash"
+        args: [ "./scripts/pre.sh", "{{`{{ .Release.Name }}`}}"]
     values:
-      - helm/{{`{{ .Release.Name }}`}}/values.yaml
-    secrets:
-      - helm/{{`{{ .Release.Name }}`}}/values.secrets.yaml
+      - values/{{`{{ .Release.Name }}`}}/values.yaml
+      - values/{{`{{ .Release.Name }}`}}/values.secrets.yaml
 
 releases:
   - name: ingress
@@ -39,19 +47,13 @@ releases:
     version: 0.12.0
     <<: *default
 
-  - name: prometheus
-    chart: stable/prometheus-operator
-    namespace: monitoring
-    version: 8.13.12
-    <<: *default
-
   - name: emby
-    chart: ./emby
+    chart: ./charts/emby
     namespace: emby
     <<: *default
 
   - name: ovh-dns-updater
-    chart: ./baremetal_external_dns/ovh-dns-updater
+    chart: ./charts/ovh-dns-updater
     namespace: kube-system
     <<: *default
 
@@ -61,15 +63,26 @@ releases:
     namespace: rtorrent
     <<: *default
 
+  - name: nextcloud
+    chart: stable/nextcloud
+    version: 1.12.0
+    namespace: nextcloud
+    <<: *default
+
   # - name: octoprint
   #   chart: halkeye/octoprint
   #   version: 0.1.1
   #   namespace: octoprint
   #   <<: *default
 
+  - name: prometheus
+    chart: stable/prometheus-operator
+    namespace: monitoring
+    version: 8.13.12
+    <<: *default
+
   - name: loki
     chart: loki/loki-stack
     version: 0.37.3
-    namespace: loki
+    namespace: monitoring
     <<: *default
-

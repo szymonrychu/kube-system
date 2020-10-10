@@ -28,5 +28,3 @@ sudo mkdir -p /mnt/disk/prometheus
 sudo mkdir -p /mnt/disk/emby
 sudo chmod 777 /mnt/disk/*
 sudo chmod 777 /mnt/disk
-
-./apply.sh

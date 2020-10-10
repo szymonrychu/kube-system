@@ -3,9 +3,8 @@ prometheusOperator:
   createCustomResource: false
   
 grafana:
-  adminPassword: admin
   initChownData:
-    enabled: false
+    enabled: true
   persistence:
     type: pvc
     enabled: true
@@ -34,8 +33,6 @@ grafana:
       enabled: true
       host: "smtp.gmail.com:465"
       from_address: "monitoring.szymonrichert.pl@gmail.com"
-      user: "monitoring.szymonrichert.pl@gmail.com"
-      password: "iYZMKpahRuP87e7c4ACUd7RYGECD7J4H"
   
   additionalDataSources:
     - name: Loki
@@ -50,9 +47,7 @@ alertmanager:
   config:
     global:
       smtp_smarthost: "smtp.gmail.com:465"
-      smtp_auth_username: "monitoring.szymonrichert.pl@gmail.com"
       smtp_from: "monitoring.szymonrichert.pl@gmail.com"
-      smtp_auth_password: "iYZMKpahRuP87e7c4ACUd7RYGECD7J4H"
 
 prometheus:
   prometheusSpec:

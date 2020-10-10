@@ -1,6 +1,5 @@
-
-floodSecret: "*oik4sahx9EeKae5!"
-
+uid: 1000
+gid: 1000
 
 ingress:
   enabled: true

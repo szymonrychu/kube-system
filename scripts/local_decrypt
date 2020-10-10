@@ -1,0 +1,33 @@
+#!/bin/bash -e
+
+if [ -z "$1" ]; then
+    echo "Please provide file to encrypt!"
+    exit 1
+fi
+
+if ! env | grep "ENCRYPTION_PASSWORD" > /dev/null; then
+    echo -n "ENCRYPTION_PASSWORD: "
+    read -s ENCRYPTION_PASSWORD
+    if [ -z "$ENCRYPTION_PASSWORD" ]; then
+        echo "Please provide ENCRYPTION_PASSWORD!"
+        exit 1
+    fi
+fi
+
+# macos doesn't have realpath binary (as linux does..), workaround below
+# based on https://stackoverflow.com/questions/3572030/bash-script-absolute-path-with-osx
+FILE_FULL_PATH=`python3 -c "import os; print(os.path.realpath('$1'))"`
+DECRYPT_DIR="$(dirname ${FILE_FULL_PATH})"
+FILE_BASENAME="$(basename ${FILE_FULL_PATH})"
+cd $DECRYPT_DIR
+
+docker run \
+    -v $(pwd):/workdir \
+    -e ENCRYPTION_PASSWORD="${ENCRYPTION_PASSWORD}" \
+    --rm -it \
+    alpine:3.10.3 \
+    sh -c "apk add --update --no-cache openssl sed \
+        && cd /workdir && cp ${FILE_BASENAME} ${FILE_BASENAME}.orig \
+        && sed -i 's/^# *//' ${FILE_BASENAME}.orig \
+        && openssl aes-256-cbc -d -a -k \"${ENCRYPTION_PASSWORD}\" -pbkdf2 -salt -in ${FILE_BASENAME}.orig -out ${FILE_BASENAME} \
+        && rm ${FILE_BASENAME}.orig"

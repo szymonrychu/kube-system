@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+data:
+  auth: c3p5bW9ucmk6JDJ5JDEwJE1VMWJBNjRialloNVB1VE1NQ2VIUE92UXo2a0RnVUtsL3NXQmJJendoakZOZEp3VTFzUHZDCg==
+kind: Secret
+metadata:
+  name: rtorrent-external
+  namespace: rtorrent
+type: Opaque

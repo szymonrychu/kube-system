@@ -1,0 +1,125 @@
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 4G
+    nginx.ingress.kubernetes.io/server-snippet: |-
+      server_tokens off;
+      proxy_hide_header X-Powered-By;
+
+      rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+      rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+      rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
+      location = /.well-known/carddav {
+        return 301 $scheme://$host/remote.php/dav;
+      }
+      location = /.well-known/caldav {
+        return 301 $scheme://$host/remote.php/dav;
+      }
+      location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+      }
+      location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+        deny all;
+      }
+      location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
+        deny all;
+      }
+  path: /
+  hosts:
+    - jellyfin.szymonrichert.pl
+  tls:
+    - secretName: nextcloud-tls
+      hosts:
+        - nextcloud.szymonrichert.pl
+
+nextcloud:
+  host: nextcloud.szymonrichert.pl
+  update: 0
+  datadir: /var/www/html/data
+  tableprefix:
+  persistence:
+    subPath:
+  mail:
+    enabled: true
+    fromAddress: "monitoring.szymonrichert.pl@gmail.com"
+    host: "smtp.gmail.com:465"
+    smtp:
+      host: "smtp.gmail.com:465"
+      secure: ssl
+      port: 465
+      authtype: LOGIN
+  strategy:
+    type: Recreate
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxSurge: 1
+    #   maxUnavailable: 0
+
+internalDatabase:
+  enabled: true
+  name: nextcloud
+
+##
+## External database configuration
+##
+externalDatabase:
+  enabled: false
+
+  ## Supported database engines: mysql or postgresql
+  type: mysql
+
+  ## Database host
+  host:
+
+  ## Database name
+  database: nextcloud
+
+##
+## MariaDB chart configuration
+##
+mariadb:
+  ## Whether to deploy a mariadb server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
+  enabled: false
+
+  db:
+    name: nextcloud
+
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    enabled: false
+    accessMode: ReadWriteOnce
+    size: 8Gi
+
+redis:
+  enabled: false
+  usePassword: false
+
+cronjob:
+  enabled: true
+
+persistence:
+  enabled: true
+  storageClass: nextcloud-local-pv
+  accessMode: ReadWriteOnce
+  size: 8Gi
+
+metrics:
+  enabled: true
+
+  replicaCount: 1
+  https: false
+  timeout: 5s
+
+  image:
+    repository: xperimental/nextcloud-exporter
+    tag: v0.3.0
+    pullPolicy: IfNotPresent

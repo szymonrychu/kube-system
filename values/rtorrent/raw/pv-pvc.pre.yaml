@@ -1,0 +1,56 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rtorrent-local-pv
+  labels:
+    type: local
+spec:
+  storageClassName: rtorrent-local-pv
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/disk/emby/medias"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rtorrent-config-local-pv
+  labels:
+    type: local
+spec:
+  storageClassName: rtorrent-config-local-pv
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/disk/rtorrent"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rtorrent-local-pvc
+  namespace: rtorrent
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: rtorrent-local-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rtorrent-config-local-pvc
+  namespace: rtorrent
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rtorrent-config-local-pv
