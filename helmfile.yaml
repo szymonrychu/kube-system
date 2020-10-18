@@ -11,6 +11,8 @@ repositories:
     url: https://grafana.github.io/loki/charts
   - name: halkeye
     url: https://halkeye.github.io/helm-charts/
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
 
 templates:
   default: &default
@@ -29,22 +31,22 @@ templates:
       - values/{{`{{ .Release.Name }}`}}/values.secrets.yaml
 
 releases:
-  - name: ingress
-    chart: stable/nginx-ingress
+  - name: kong
+    chart: kong/kong
     namespace: kube-system
-    version: 1.39.0
+    version: "1.9.*"
     <<: *default
 
   - name: cert-manager
     chart: jetstack/cert-manager
     namespace: kube-system
-    version: 0.15.1
+    version: "0.15.*"
     <<: *default
 
   - name: metallb
     chart: stable/metallb
     namespace: kube-system
-    version: 0.12.0
+    version: "0.12.*"
     <<: *default
 
   - name: emby
@@ -59,14 +61,21 @@ releases:
 
   - name: rtorrent
     chart: billimek/rtorrent-flood
-    version: 4.1.1
+    version: "4.1.*"
     namespace: rtorrent
     <<: *default
 
-  - name: nextcloud
-    chart: stable/nextcloud
-    version: 1.12.0
-    namespace: nextcloud
+  # - name: nextcloud
+  #   chart: stable/nextcloud
+  #   version: "1.12.*"
+  #   namespace: nextcloud
+  #   <<: *default
+
+  - name: keycloak
+    timeout: 600
+    version: "9.0.*"
+    chart: codecentric/keycloak
+    namespace: keycloak
     <<: *default
 
   # - name: octoprint
@@ -76,9 +85,9 @@ releases:
   #   <<: *default
 
   - name: prometheus
-    chart: stable/prometheus-operator
+    chart: prometheus-community/kube-prometheus-stack
     namespace: monitoring
-    version: 8.13.12
+    version: "9.3.*"
     <<: *default
 
   - name: loki

@@ -1,0 +1,15 @@
+ingressController:
+  installCRDs: false
+
+image:
+  repository: szymonrychu/kong-oidc
+  tag: latest-dev
+
+env:
+  plugins: "bundled,oidc"
+
+proxy:
+  http:
+    hostPort: 80
+  tls:
+    hostPort: 443

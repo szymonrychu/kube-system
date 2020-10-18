@@ -1,0 +1,20 @@
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+plugin: cors
+metadata:
+  name: cors
+  namespace: development
+config: 
+  origins:
+    - ".*\.szymonrichert\.pl"
+  methods:
+  - GET
+  - POST
+  - PUT
+  - OPTIONS
+  - DELETE
+  exposed_headers:
+  - X-Auth-Token
+  credentials: true
+  max_age: 3600

@@ -13,7 +13,7 @@ spec:
     solvers:
     - http01:
         ingress:
-          class: nginx
+          class: kong
       selector:
         dnsZones:
         - 'szymonrichert.pl'

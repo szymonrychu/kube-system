@@ -1,0 +1,12 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+plugin: oidc
+metadata:
+  name: oidc
+config:
+  client_id: kong
+  client_secret: 3777af87-99bc-48be-b17e-47248ea9bb25
+  discovery: https://auth.szymonrichert.pl/auth/realms/szymonrichert/.well-known/openid-configuration
+  introspection_endpoint: https://auth.szymonrichert.pl/auth/realms/szymonrichert/protocol/openid-connect/token/introspect
+  realm: szymonrichert
+  scope: openid
