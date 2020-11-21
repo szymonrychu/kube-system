@@ -10,7 +10,8 @@ ingress:
     plugins.konghq.com: oidc,cors
   hosts:
     - vessel.szymonrichert.pl
-  path: /
+  paths: 
+    - "/"
   tls:
     - secretName: vessel-tls
       hosts:
