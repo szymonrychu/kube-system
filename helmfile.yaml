@@ -43,11 +43,11 @@ releases:
     version: "0.15.*"
     <<: *default
 
-  - name: metallb
-    chart: stable/metallb
-    namespace: kube-system
-    version: "0.12.*"
-    <<: *default
+  # - name: metallb
+  #   chart: stable/metallb
+  #   namespace: kube-system
+  #   version: "0.12.*"
+  #   <<: *default
 
   - name: emby
     chart: ./charts/emby

@@ -1,0 +1,57 @@
+name: main
+
+on: 
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup helmfile
+      uses: mamezou-tech/setup-helmfile@v0.3.0
+      with:
+        kubectl-version:  v1.18.3
+        helm-version:     v3.2.1
+        helmfile-version: v0.118.5
+
+    - name: Turnstyle
+      uses: softprops/turnstyle@v1
+      with:
+        continue-after-seconds: 180
+        poll-interval-seconds: 10
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+    - name: Setup
+      env:
+        K8S_CONFIG_FILE: ${{ secrets.K8S_CONFIG_FILE }}
+      run: |
+        helm plugin install https://github.com/databus23/helm-diff || true
+        helm plugin install https://github.com/hypnoglow/helm-s3.git || true
+        helm plugin install https://github.com/futuresimple/helm-secrets || true
+        mkdir -p ~/.kube/; echo "${K8S_CONFIG_FILE}" > ~/.kube/config
+        find . -name "*.secrets.yaml"  -exec ./scripts/local_decrypt {} \;
+
+    - name: Helmfile diff
+      env:
+        ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
+      run: |
+        helmfile -f helmfile.yaml diff
+
+    - name: Helmfile apply
+      if: github.ref == 'refs/heads/master'
+      id: apply_helmfile
+      run: |
+        helmfile -f helmfile.yaml apply
