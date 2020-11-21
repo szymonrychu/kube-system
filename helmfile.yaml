@@ -15,6 +15,8 @@ repositories:
     url: https://prometheus-community.github.io/helm-charts
   - name: kong
     url: https://charts.konghq.com
+  - name: codecentric
+    url: https://codecentric.github.io/helm-charts
 
 templates:
   default: &default
