@@ -1,0 +1,17 @@
+uid: 1000
+gid: 1000
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
+    plugins.konghq.com: oidc,cors
+  hosts:
+    - vessel.szymonrichert.pl
+  path: /
+  tls:
+    - secretName: vessel-tls
+      hosts:
+      - vessel.szymonrichert.pl

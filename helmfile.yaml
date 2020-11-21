@@ -99,3 +99,8 @@ releases:
     version: 0.37.3
     namespace: monitoring
     <<: *default
+
+  - name: vessel
+    chart: ./charts/vessel-server
+    namespace: vessel
+    <<: *default
