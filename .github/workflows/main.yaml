@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Setup helmfile
-      uses: mamezou-tech/setup-helmfile@v0.3.0
+      uses: mamezou-tech/setup-helmfile@v0.6.0
       with:
         kubectl-version:  v1.18.3
         helm-version:     v3.2.1
