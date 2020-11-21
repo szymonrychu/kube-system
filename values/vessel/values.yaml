@@ -9,9 +9,9 @@ ingress:
     kubernetes.io/tls-acme: "true"
     plugins.konghq.com: oidc,cors
   hosts:
-    - vessel.szymonrichert.pl
-  paths: 
-    - "/"
+    - host: vessel.szymonrichert.pl
+      paths: 
+        - "/"
   tls:
     - secretName: vessel-tls
       hosts:
