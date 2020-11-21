@@ -37,6 +37,7 @@ jobs:
     - name: Setup
       env:
         K8S_CONFIG_FILE: ${{ secrets.K8S_CONFIG_FILE }}
+        ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
       run: |
         helm plugin install https://github.com/databus23/helm-diff || true
         helm plugin install https://github.com/hypnoglow/helm-s3.git || true
@@ -45,13 +46,10 @@ jobs:
         find . -name "*.secrets.yaml"  -exec ./scripts/local_decrypt {} \;
 
     - name: Helmfile diff
-      env:
-        ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
       run: |
         helmfile -f helmfile.yaml diff
 
     - name: Helmfile apply
       if: github.ref == 'refs/heads/master'
-      id: apply_helmfile
       run: |
         helmfile -f helmfile.yaml apply
