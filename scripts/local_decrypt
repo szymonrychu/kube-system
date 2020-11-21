@@ -24,7 +24,7 @@ cd $DECRYPT_DIR
 docker run \
     -v $(pwd):/workdir \
     -e ENCRYPTION_PASSWORD="${ENCRYPTION_PASSWORD}" \
-    --rm -it \
+    --rm \
     alpine:3.10.3 \
     sh -c "apk add --update --no-cache openssl sed \
         && cd /workdir && cp ${FILE_BASENAME} ${FILE_BASENAME}.orig \
