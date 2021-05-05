@@ -109,6 +109,6 @@ releases:
 
   - name: plant-watering-server
     chart: szymonrychu/plant-manager
-    version: 0.0.1-1620247354-82ec8b1
+    version: 0.0.1-1620248203-27f44ee
     namespace: plant-manager
     <<: *default
