@@ -17,6 +17,8 @@ repositories:
     url: https://charts.konghq.com
   - name: codecentric
     url: https://codecentric.github.io/helm-charts
+  - name: szymonrychu
+    url: https://raw.githubusercontent.com/szymonrychu/charts/master/
 
 templates:
   default: &default
@@ -103,4 +105,10 @@ releases:
   - name: vessel
     chart: ./charts/vessel-server
     namespace: vessel
+    <<: *default
+
+  - name: plant-watering-server
+    chart: szymonrychu/plant-manager
+    version: 0.0.1-1620247354-82ec8b1
+    namespace: plant-manager
     <<: *default
