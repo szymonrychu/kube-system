@@ -11,5 +11,6 @@ ingress:
         - /plant-humidity
   tls:
     - secretName: tls
-      host: iot.szymonrichert.pl
+      hosts: 
+        - iot.szymonrichert.pl
       
