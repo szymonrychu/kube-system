@@ -6,9 +6,10 @@ ingress:
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   hosts:
-    - iot.szymonrichert.pl
-  path: /
+    - host: iot.szymonrichert.pl
+      paths:
+        - /plant-humidity
   tls:
-    - hosts:
-      - iot.szymonrichert.pl
-      secretName: tls
+    - secretName: tls
+      host: iot.szymonrichert.pl
+      
