@@ -23,7 +23,7 @@ jobs:
       with:
         kubectl-version:  v1.18.3
         helm-version:     v3.2.1
-        helmfile-version: v0.118.5
+        helmfile-version: v0.138.4
 
     - name: Turnstyle
       uses: softprops/turnstyle@v1
