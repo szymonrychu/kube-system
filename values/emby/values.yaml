@@ -5,20 +5,22 @@ ingress:
     kubernetes.io/ingress.class: "kong"
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/tls-acme: "true"
-  path: /
   hosts:
-    - emby.szymonrichert.pl
+    - host: emby.szymonrichert.pl
+      paths: 
+        - /
   tls:
     - secretName: emby-tls
       hosts:
         - emby.szymonrichert.pl
 
-volumes:
+
+additionalVolumes:
   - name: emby-local-pvc
     persistentVolumeClaim:
       claimName: emby-local-pvc
 
-volumeMounts:
+additionalVolumeMounts:
   - name: emby-local-pvc
     mountPath: "/config"
     subPath: "configs"

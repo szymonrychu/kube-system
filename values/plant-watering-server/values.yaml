@@ -1,5 +1,5 @@
 config:
-  plantHumidityLimit: 430
+  plantHumidityLimit: 450
 
 ingress:
   enabled: true

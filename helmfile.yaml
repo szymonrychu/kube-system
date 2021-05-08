@@ -19,7 +19,9 @@ repositories:
     url: https://codecentric.github.io/helm-charts
   - name: szymonrychu
     url: https://raw.githubusercontent.com/szymonrychu/charts/master/
-
+  - name: ccremer
+    url: https://ccremer.github.io/charts
+     
 templates:
   default: &default
     missingFileHandler: Warn
@@ -68,15 +70,17 @@ releases:
     namespace: keycloak
     <<: *default
 
-  - name: prometheus-operator
+  - name: prometheus
     namespace: monitoring
     chart: prometheus-community/kube-prometheus-stack
-    version: "13.13.*"
+    version: 15.4.4
     force: true
     # passes --disable-validation to helm 3 diff plugin, this requires diff plugin >= 3.1.2 It may be helpful to deploy charts with helm api v1 CRDS
     disableValidation: true
     # passes --disable-validation to helm 3 diff plugin, this requires diff plugin >= 3.1.2 It may be helpful to deploy charts with helm api v1 CRDS
     disableValidationOnInstall: true
+    # passes --disable-validation to helm 3 diff plugin, this requires diff plugin >= 3.1.2 It may be helpful to deploy charts with helm api v1 CRDS
+    # disableOpenApiValidation: true
     <<: *default
 
   - name: loki
@@ -86,7 +90,8 @@ releases:
     <<: *default
 
   - name: emby
-    chart: ./charts/emby
+    chart: ccremer/emby
+    version: 0.2.0
     namespace: emby
     <<: *default
 
