@@ -46,54 +46,37 @@ releases:
   - name: cert-manager
     chart: jetstack/cert-manager
     namespace: kube-system
-    version: "0.15.*"
-    <<: *default
-
-  # - name: metallb
-  #   chart: stable/metallb
-  #   namespace: kube-system
-  #   version: "0.12.*"
-  #   <<: *default
-
-  - name: emby
-    chart: ./charts/emby
-    namespace: emby
+    version: "1.2.*"
     <<: *default
 
   - name: ovh-dns-updater
-    chart: ./charts/ovh-dns-updater
+    chart: szymonrychu/ovh-dns-updater
+    version: 1.0.0
     namespace: kube-system
     <<: *default
 
-  - name: rtorrent
-    chart: billimek/rtorrent-flood
-    version: "4.1.*"
-    namespace: rtorrent
+  - name: metallb
+    chart: stable/metallb
+    namespace: kube-system
+    version: "2.0.4" # latest release without 'common' bitnami chart in dependencies
     <<: *default
-
-  # - name: nextcloud
-  #   chart: stable/nextcloud
-  #   version: "1.12.*"
-  #   namespace: nextcloud
-  #   <<: *default
 
   - name: keycloak
     timeout: 600
-    version: "9.0.*"
+    version: 10.1.0
     chart: codecentric/keycloak
     namespace: keycloak
     <<: *default
 
-  # - name: octoprint
-  #   chart: halkeye/octoprint
-  #   version: 0.1.1
-  #   namespace: octoprint
-  #   <<: *default
-
-  - name: prometheus
-    chart: prometheus-community/kube-prometheus-stack
+  - name: prometheus-operator
     namespace: monitoring
-    version: "9.3.*"
+    chart: prometheus-community/kube-prometheus-stack
+    version: "13.13.*"
+    force: true
+    # passes --disable-validation to helm 3 diff plugin, this requires diff plugin >= 3.1.2 It may be helpful to deploy charts with helm api v1 CRDS
+    disableValidation: true
+    # passes --disable-validation to helm 3 diff plugin, this requires diff plugin >= 3.1.2 It may be helpful to deploy charts with helm api v1 CRDS
+    disableValidationOnInstall: true
     <<: *default
 
   - name: loki
@@ -102,13 +85,19 @@ releases:
     namespace: monitoring
     <<: *default
 
-  - name: vessel
-    chart: ./charts/vessel-server
-    namespace: vessel
+  - name: emby
+    chart: ./charts/emby
+    namespace: emby
+    <<: *default
+
+  - name: rtorrent
+    chart: billimek/rtorrent-flood
+    version: "4.1.*"
+    namespace: rtorrent
     <<: *default
 
   - name: plant-watering-server
     chart: szymonrychu/plant-manager
-    version: 0.0.1-1620278657-79fc598
+    version: 1.0.0
     namespace: plant-manager
     <<: *default

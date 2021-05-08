@@ -1,0 +1,15 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: plant-manager
+  namespace: plant-manager
+  labels:
+    app: plant-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: plant-manager
+  endpoints:
+  - port: http
+    interval: 10m
