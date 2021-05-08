@@ -38,9 +38,9 @@ jobs:
         K8S_CONFIG_FILE: ${{ secrets.K8S_CONFIG_FILE }}
         ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
       run: |
-        helm plugin install https://github.com/databus23/helm-diff || helm plugin update https://github.com/databus23/helm-diff
-        helm plugin install https://github.com/hypnoglow/helm-s3.git || helm plugin update https://github.com/hypnoglow/helm-s3.git
-        helm plugin install https://github.com/futuresimple/helm-secrets || helm plugin update https://github.com/futuresimple/helm-secrets
+        helm plugin install https://github.com/databus23/helm-diff || helm plugin update diff
+        helm plugin install https://github.com/hypnoglow/helm-s3.git || helm plugin update s3
+        helm plugin install https://github.com/futuresimple/helm-secrets || helm plugin update secrets
         mkdir -p ~/.kube/; echo "${K8S_CONFIG_FILE}" > ~/.kube/config
         find . -name "*.secrets.yaml"  -exec ./scripts/local_decrypt {} \;
 
