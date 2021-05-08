@@ -56,7 +56,7 @@ releases:
     <<: *default
 
   - name: metallb
-    chart: stable/metallb
+    chart: bitnami/metallb
     namespace: kube-system
     version: "2.0.4" # latest release without 'common' bitnami chart in dependencies
     <<: *default
